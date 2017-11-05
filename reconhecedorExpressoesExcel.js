@@ -1,17 +1,43 @@
 expressaoExcel
-	= cabeca:termo cauda:(termo)* {
+  = cabeca:funcPrincipal cauda:(Expression)* {
       return cauda.reduce(function(result, element) {
       }, cabeca);
     }
     
-termo
-	= "=ASIN(" _ (numeroModuloMenorQueUm) _ ")" _
-    / "=asin(" _ (numeroModuloMenorQueUm) _ ")" _ 
-    / "=SIN(" _ (numeroReal) _ ")" _
-    / "=sin(" _ (numeroReal) _ ")" _
-    / "=SQRT(" _ (numeroPositivo) _ ")" _
-    / "=sqrt(" _ (numeroPositivo) _ ")" _
+funcPrincipal
+  = "=" funcao
 
+funcao
+  = nomeFuncao "(" _ Expression _ ")" _
+ 
+nomeFuncao
+  = "ASIN" / "asin"
+    / "SIN" / "sin"
+    / "SQRT" / "sqrt"
+
+Expression
+  = head:Term tail:(_ ("+" / "-") _ Term)* {
+      return tail.reduce(function(result, element) {
+        if (element[1] === "+") { return result + element[3]; }
+        if (element[1] === "-") { return result - element[3]; }
+      }, head);
+    }
+
+Term
+  = head:Factor tail:(_ ("*" / "/") _ Factor)* {
+      return tail.reduce(function(result, element) {
+        if (element[1] === "*") { return result * element[3]; }
+        if (element[1] === "/") { return result / element[3]; }
+      }, head);
+    }
+
+Factor
+  = "(" _ expr:Expression _ ")" { return expr; }
+  / Integer
+  / funcao
+
+Integer "integer"
+  = _ [0-9]+ { return parseInt(text(), 10); }
 
 numeroReal = ("-"?(inteiro+)(".")(inteiro+) / "-"?(inteiro+))
 numeroPositivo = ((inteiro+)(".")(inteiro+) / (inteiro+))
