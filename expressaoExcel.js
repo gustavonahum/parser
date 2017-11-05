@@ -26,7 +26,6 @@ nomeFuncaoMatematica
   = "ASIN" / "asin"
     / "SIN" / "sin"
     / "SQRT" / "sqrt"
-    / "SUM" / "sum"
 
 funcaoLogica
   = func:nomeFuncaoLogica "(" _ explog:expressaoLogica _ ";" _ exp1:expressao _ ";" _ exp2:expressao _ ")" _ {
