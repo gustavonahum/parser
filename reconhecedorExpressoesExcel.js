@@ -1,25 +1,44 @@
 expressaoExcel
-  = (simboloIgual:"=" cabeca:funcao {
-      return cabeca;
+  = (simboloIgual:"=" func:funcaoMatematica {
+      return func;
+    }
+    / simboloIgual:"=" func:funcaoLogica {
+      return func;
     })?
 
-funcao
-  = func:nomeFuncao "(" _ expr:expressao _ ")" _ {
-      if (func === "ASIN" || func === "asin") {
-          return Math.asin(expr);
-        }
-        if (func === "SIN" || func === "sin") {
-          return Math.sin(expr);
-        }
-        if (func === "SQRT" || func === "sqrt") {
-          return Math.sqrt(expr);
-        }
+funcaoMatematica
+  = func:nomeFuncaoMatematica "(" _ expr:expressao _ ")" _ {
+      if (func === "ASIN" || func === "asin") { return Math.asin(expr); }
+        if (func === "SIN" || func === "sin") { return Math.sin(expr); }
+        if (func === "SQRT" || func === "sqrt") { return Math.sqrt(expr); }
     }
- 
-nomeFuncao
+
+nomeFuncaoMatematica
   = "ASIN" / "asin"
     / "SIN" / "sin"
     / "SQRT" / "sqrt"
+
+funcaoLogica
+  = func:nomeFuncaoLogica "(" _ explog:expressaoLogica _ ";" _ exp1:expressao _ ";" _ exp2:expressao _ ")" _ {
+      if (func === "IF" || func === "if") {
+            if (explog) { return exp1; }
+            return exp2;
+        }
+    }
+
+nomeFuncaoLogica
+  = "IF" / "if"
+
+
+expressaoLogica
+  = cabeca:expressao _ comparador:Comparador lixo:Comparador ? _ cauda:expressao {
+        if(comparador == ">") { return (cabeca > cauda); }
+          if(comparador == "<") { return (cabeca < cauda); }
+          if(comparador == "=") { return (cabeca === cauda); }
+          if(comparador == "<=") { return (cabeca <= cauda); }
+          if(comparador == ">=") { return (cabeca >= cauda); }
+          if(comparador == "<>") { return (cabeca !== cauda); }
+   }
 
 expressao
   = cabeca:termo cauda:(_ ("+" / "-") _ termo)* {
@@ -41,13 +60,16 @@ fator
   = "(" _ expr:expressao _ ")" { return expr; }
   / numeroReal
   / numeroInteiro
-  / funcao
+  / funcaoMatematica
 
 numeroReal "numeroReal"
   = ("-"?(digito+)(".")(digito+)) { return parseFloat(text()); }
 
 numeroInteiro "numeroInteiro"
   = ("-"?(digito+)) { return parseInt(text(),10); }
+
+Comparador
+  = ( "<" / ">" / "=" / ">=" / "<=" / "<>" )
 
 digito = [0-9]
 
