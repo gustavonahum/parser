@@ -1,49 +1,54 @@
 expressaoExcel
-  = cabeca:funcPrincipal cauda:(Expression)* {
-      return cauda.reduce(function(result, element) {
-      }, cabeca);
-    }
-    
-funcPrincipal
-  = "=" funcao
+  = (simboloIgual:"=" cabeca:funcao {
+      return cabeca;
+    })?
 
 funcao
-  = nomeFuncao "(" _ Expression _ ")" _
+  = func:nomeFuncao "(" _ expr:expressao _ ")" _ {
+      if (func === "ASIN" || func === "asin") {
+          return Math.asin(expr);
+        }
+        if (func === "SIN" || func === "sin") {
+          return Math.sin(expr);
+        }
+        if (func === "SQRT" || func === "sqrt") {
+          return Math.sqrt(expr);
+        }
+    }
  
 nomeFuncao
   = "ASIN" / "asin"
     / "SIN" / "sin"
     / "SQRT" / "sqrt"
 
-Expression
-  = head:Term tail:(_ ("+" / "-") _ Term)* {
-      return tail.reduce(function(result, element) {
-        if (element[1] === "+") { return result + element[3]; }
-        if (element[1] === "-") { return result - element[3]; }
-      }, head);
+expressao
+  = cabeca:termo cauda:(_ ("+" / "-") _ termo)* {
+      return cauda.reduce(function(resultado, elemento) {
+        if (elemento[1] === "+") { return resultado + elemento[3]; }
+        if (elemento[1] === "-") { return resultado - elemento[3]; }
+      }, cabeca);
     }
 
-Term
-  = head:Factor tail:(_ ("*" / "/") _ Factor)* {
-      return tail.reduce(function(result, element) {
-        if (element[1] === "*") { return result * element[3]; }
-        if (element[1] === "/") { return result / element[3]; }
-      }, head);
+termo
+  = cabeca:fator cauda:(_ ("*" / "/") _ fator)* {
+      return cauda.reduce(function(resultado, elemento) {
+        if (elemento[1] === "*") { return resultado * elemento[3]; }
+        if (elemento[1] === "/") { return resultado / elemento[3]; }
+      }, cabeca);
     }
 
-Factor
-  = "(" _ expr:Expression _ ")" { return expr; }
-  / Integer
+fator
+  = "(" _ expr:expressao _ ")" { return expr; }
+  / numeroReal
+  /numeroInteiro
   / funcao
 
-Integer "integer"
-  = _ [0-9]+ { return parseInt(text(), 10); }
+numeroReal "numeroReal"
+  = ("-"?(inteiro+)(".")(inteiro+)) { return parseFloat(text()); }
 
-numeroReal = ("-"?(inteiro+)(".")(inteiro+) / "-"?(inteiro+))
-numeroPositivo = ((inteiro+)(".")(inteiro+) / (inteiro+))
-numeroModuloMenorQueUm = ("-"?("0.")(inteiro+) / "-"?"1."("0"*) / "-"?"1")
-inteiroPositivo = ([1-9])([0-9]*)
-letra = [a-zA-Z]
+numeroInteiro "numeroInteiro"
+  = ("-"?(inteiro+)) { return parseInt(text(),10); }
+
 inteiro = [0-9]
 
 _ "whitespace"
