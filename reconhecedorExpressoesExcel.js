@@ -40,16 +40,16 @@ termo
 fator
   = "(" _ expr:expressao _ ")" { return expr; }
   / numeroReal
-  /numeroInteiro
+  / numeroInteiro
   / funcao
 
 numeroReal "numeroReal"
-  = ("-"?(inteiro+)(".")(inteiro+)) { return parseFloat(text()); }
+  = ("-"?(digito+)(".")(digito+)) { return parseFloat(text()); }
 
 numeroInteiro "numeroInteiro"
-  = ("-"?(inteiro+)) { return parseInt(text(),10); }
+  = ("-"?(digito+)) { return parseInt(text(),10); }
 
-inteiro = [0-9]
+digito = [0-9]
 
 _ "whitespace"
   = [ \t\n\r]*
