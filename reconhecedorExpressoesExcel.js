@@ -5,7 +5,7 @@ expressaoExcel
     }
     
 termo
-	= "=ASIN(" _ (num:numeroModuloMenorQueUm) _ ")" _
+	= "=ASIN(" _ (numeroModuloMenorQueUm) _ ")" _
     / "=asin(" _ (numeroModuloMenorQueUm) _ ")" _ 
     / "=SIN(" _ (numeroReal) _ ")" _
     / "=sin(" _ (numeroReal) _ ")" _
